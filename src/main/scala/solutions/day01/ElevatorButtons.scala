@@ -6,13 +6,13 @@ import framework.PuzzleSolver
 class ElevatorButtons extends PuzzleSolver {
 
     override def solvePart1(input: List[String]): Any =
-        input.transform.map(b => b.floor).sum
+        input.transform.sum
 
     override def solvePart2(input: List[String]): Any =
-        input.transform.map(b => b.floor).scanLeft(0)(_ + _).indexOf(-1)
+        input.transform.scanLeft(0)(_ + _).indexOf(-1)
 
     extension (l: List[String])
-        private def transform: List[Button] = l.head.toList.map[Button](c => Button.values.find(b => b.value.equals(c)).get)
+        private def transform: List[Int] = l.head.toList.map[Int](c => Button.values.find(b => b.value.equals(c)).get.floor)
 }
 
 enum Button(val value: Char, val floor: Int):
