@@ -11,10 +11,8 @@ class ElevatorButtons extends PuzzleSolver {
     override def solvePart2(input: List[String]): Any =
         input.transform.scanLeft(0)(_ + _).indexOf(-1)
 
-    extension (l: List[String])
-        private def transform: List[Int] = l.head.toList.map[Int](c => Button.values.find(b => b.value.equals(c)).get.floor)
-}
+    private val inputMapper = Map('(' -> 1, ')' -> -1)
 
-enum Button(val value: Char, val floor: Int):
-    case Up extends Button('(', 1)
-    case Down extends Button(')', -1)
+    extension (l: List[String])
+        private def transform: List[Int] = l.head.toList.map[Int](c => inputMapper(c))
+}
