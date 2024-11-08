@@ -12,8 +12,8 @@ def aoc2024(args: String*): Unit =
     val day = args(0).toInt
     val solver = solvers(day)
     val input = InputReader.read(day)
+    println(f"\nSolving AoC 2015 day $day")
     val solution1 = solver.part1(input)
     val solution2 = solver.part2(input)
-    println("\nSolving AoC 2015 day " + day)
-    println("  Part 1: " + solution1(0) + "   in " + solution1(1) + " msecs")
-    println("  Part 2: " + solution2(0) + "   in " + solution2(1) + " msecs")
+    println(f"  Part 1: ${solution1(0)}   in ${solution1(1)} msecs")
+    println(f"  Part 2: ${solution2(0)}   in ${solution2(1)} msecs")
