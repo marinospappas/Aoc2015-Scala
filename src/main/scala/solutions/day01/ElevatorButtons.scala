@@ -14,5 +14,5 @@ class ElevatorButtons extends PuzzleSolver {
     private val inputMapper = Map('(' -> 1, ')' -> -1)
 
     extension (l: List[String])
-        private def transform: List[Int] = l.head.toList.map[Int](c => inputMapper(c))
+        private def transform: List[Int] = l.head.toList.map[Int](inputMapper(_))
 }
