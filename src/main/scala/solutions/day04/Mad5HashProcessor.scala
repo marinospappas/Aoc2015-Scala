@@ -15,16 +15,17 @@ class Mad5HashProcessor extends PuzzleSolver {
         boundary:
             val key = input.head
             Range(0, Int.MaxValue).foreach { i =>
-                val md5Chcksum = Md5.checksum(f"$key$i")
+                val md5Chcksum = Md5.checksum(s"$key$i")
                 if (md5Chcksum(0) == byte0 && md5Chcksum(1) == byte0 && (md5Chcksum(2) & 0xf0) == byte0)
                     break(i)
             }
 
-    override def solvePart2(input: List[String]): Any =         boundary:
-        val key = input.head
-        Range(0, Int.MaxValue).foreach { i =>
-            val md5Chcksum = Md5.checksum(f"$key$i")
-            if (md5Chcksum(0) == byte0 && md5Chcksum(1) == byte0 && md5Chcksum(2) == byte0)
-                break(i)
-        }
+    override def solvePart2(input: List[String]): Any =
+        boundary:
+            val key = input.head
+            Range(0, Int.MaxValue).foreach { i =>
+                val md5Chcksum = Md5.checksum(s"$key$i")
+                if (md5Chcksum(0) == byte0 && md5Chcksum(1) == byte0 && md5Chcksum(2) == byte0)
+                    break(i)
+            }
 }

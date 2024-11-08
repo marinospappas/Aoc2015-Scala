@@ -18,6 +18,6 @@ extension (ba: Array[Byte])
         val hexChars = "0123456789abcdef".toCharArray
         ba.flatMap(b =>
             val byte = b.toInt
-            f"${hexChars(byte >>> 4 & 0x0F)}${hexChars(byte & 0x0F)}"
-        ).mkString("Array(", ", ", ")")
+            s"${hexChars(byte >>> 4 & 0x0F)}${hexChars(byte & 0x0F)}"
+        ).mkString("")
     }

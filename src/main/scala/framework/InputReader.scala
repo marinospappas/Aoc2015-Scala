@@ -5,9 +5,9 @@ import java.io.FileNotFoundException
 import scala.io.Source.fromFile
 
 object InputReader {
-    
+
     def read(day: Int, pattern: String = "src/main/resources/input", extension: String = "txt"): List[String] = {
-        val name = pattern + f"$day%02d" + "." + extension
+        val name = pattern + f"$day%02d" + s".$extension"
         val source = fromFile(name)
         try
             source.getLines().toList
