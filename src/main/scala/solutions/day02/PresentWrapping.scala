@@ -1,15 +1,17 @@
 package org.mpdev.scala.aoc2015
 package solutions.day02
 
-import framework.PuzzleSolver
+import framework.{InputReader, PuzzleSolver}
 
-class PresentWrapping extends PuzzleSolver{
+class PresentWrapping extends PuzzleSolver(InputReader.read(2)) {
 
-    override def solvePart1(input: List[String]): Any =
-        input.transform.map(p => p.area() + p.extra()).sum
+    private val inputData: List[Parcel] = input.transform
 
-    override def solvePart2(input: List[String]): Any =
-        input.transform.map(_.ribbon()).sum
+    override def solvePart1: Any =
+        inputData.map(p => p.area() + p.extra()).sum
+
+    override def solvePart2: Any =
+        inputData.map(_.ribbon()).sum
 
     extension (l: List[String])
         private def transform: List[Parcel] = l.map[Parcel](line => {

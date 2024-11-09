@@ -10,5 +10,5 @@ import solutions.day18.LightsAnimation
 val solvers = Map(
     1 -> ElevatorButtons(), 2 -> PresentWrapping(), 4 -> Mad5HashProcessor(),
     12 -> JsonProcessor(),
-    18 -> LightsAnimation(InputReader.read(18))
+    18 -> LightsAnimation()
 )

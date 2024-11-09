@@ -2,10 +2,10 @@ package org.mpdev.scala.aoc2015
 package solutions.day18
 
 import utils.{Grid, GridBuilder, Point}
-import framework.PuzzleSolver
+import framework.{InputReader, PuzzleSolver}
 import solutions.day18.LightState.ON
 
-class LightsAnimation(input: List[String]) extends PuzzleSolver {
+class LightsAnimation extends PuzzleSolver(InputReader.read(18)) {
 
     var grid: Grid[LightState] = input.transform()
     var repeatAnimation = 100
@@ -35,7 +35,7 @@ class LightsAnimation(input: List[String]) extends PuzzleSolver {
             for (p <- newGrid.getCorners) do newGrid.setDataPoint(p, LightState.ON)
         newGrid
 
-    override def solvePart1(input: List[String]): Any =
+    override def solvePart1: Any =
         var currentGrid = Grid(grid.getDataPoints, LightState.mapper)
         for (_ <- 1 to repeatAnimation)
             currentGrid = animate(currentGrid)
@@ -43,7 +43,7 @@ class LightsAnimation(input: List[String]) extends PuzzleSolver {
             currentGrid.printIt()
         currentGrid.countOf(LightState.ON)
 
-    override def solvePart2(input: List[String]): Any =
+    override def solvePart2: Any =
         var currentGrid = Grid(grid.getDataPoints, LightState.mapper)
         for (_ <- 1 to repeatAnimation)
             currentGrid = animate(currentGrid, 2)

@@ -11,9 +11,8 @@ def aoc2024(args: String*): Unit =
         usage()
     val day = args(0).toInt
     val solver = solvers(day)
-    val input = InputReader.read(day, extension = if (day == 12) "json" else "txt")
     println(s"\nSolving AoC 2015 day $day")
-    val solution1 = solver.part1(input)
-    val solution2 = solver.part2(input)
+    val solution1 = solver.part1
+    val solution2 = solver.part2
     println(s"  Part 1: ${solution1(0)}   in ${solution1(1)} msecs")
     println(s"  Part 2: ${solution2(0)}   in ${solution2(1)} msecs")

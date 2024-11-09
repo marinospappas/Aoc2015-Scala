@@ -1,17 +1,17 @@
 package org.mpdev.scala.aoc2015
 package solutions.day04
 
-import framework.PuzzleSolver
+import framework.{InputReader, PuzzleSolver}
 import utils.Md5
 
 import scala.util.boundary
 import scala.util.boundary.break
 
-class Mad5HashProcessor extends PuzzleSolver {
+class Mad5HashProcessor extends PuzzleSolver(InputReader.read(4)) {
 
     private val byte0 = 0.toByte
 
-    override def solvePart1(input: List[String]): Any =
+    override def solvePart1: Any =
         boundary:
             val key = input.head
             Range(0, Int.MaxValue).foreach { i =>
@@ -20,7 +20,7 @@ class Mad5HashProcessor extends PuzzleSolver {
                     break(i)
             }
 
-    override def solvePart2(input: List[String]): Any =
+    override def solvePart2: Any =
         boundary:
             val key = input.head
             Range(0, Int.MaxValue).foreach { i =>

@@ -23,20 +23,6 @@ open class Grid[T](gridData: Map[Point,T],
         DEFAULT_CHAR = defaultChar
     }
 
-    /* TODO create builder methods when needed
-    def this(xyList: List[Point], mapper: Map[Char,T] = Map(), border: Int = 1, defaultChar: Char = '.', defaultSize: (Int,Int) = (-1,-1), function: Point => T) =
-            this(mapper = mapper, border = border, defaultChar = defaultChar, defaultSize = defaultSize) {
-        xyList.forEach ( p => data(p) = function(p) )
-        updateXYDimensions(border)
-    }
-
-    def this(xRange: Range, yRange: Range, mapper: Map[Char,T] = Map(), border: Int = 1, defaultChar: Char = '.', defaultSize: (Int,Int) = (-1,-1), function: (Int,Int) => T) =
-            this(mapper = mapper, border = border, defaultChar = defaultChar, defaultSize = defaultSize) {
-        xRange.forEach ( x => yRange.forEach ( y => data(Point(x,y)) = function(x, y) ) )
-        updateXYDimensions(border)
-    }
-     */
-
     def fill(datum: T): Unit = for (key <- data.keys) do data += key -> datum
 
     def getDataPoints: Map[Point,T] = data.toMap
@@ -157,8 +143,6 @@ open class Grid[T](gridData: Map[Point,T],
         println("")
 
 }
-
-
 
 object Grid {
     val allCharsDefMapper: Map[Char, Char] = (' ' to '~').map(c => c -> c).toMap

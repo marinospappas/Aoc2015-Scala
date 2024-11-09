@@ -21,6 +21,20 @@ case class GridBuilder[T](gridData: Map[Point,T] = Map(),
 
     def fromXYSetVisual(inputXYSet: Set[String]): GridBuilder[T] = copy(gridData = processInputXY(inputXYSet))
 
+    /* TODO create additional builder methods when needed
+    def this(xyList: List[Point], mapper: Map[Char,T] = Map(), border: Int = 1, defaultChar: Char = '.', defaultSize: (Int,Int) = (-1,-1), function: Point => T) =
+            this(mapper = mapper, border = border, defaultChar = defaultChar, defaultSize = defaultSize) {
+        xyList.forEach ( p => data(p) = function(p) )
+        updateXYDimensions(border)
+    }
+
+    def this(xRange: Range, yRange: Range, mapper: Map[Char,T] = Map(), border: Int = 1, defaultChar: Char = '.', defaultSize: (Int,Int) = (-1,-1), function: (Int,Int) => T) =
+            this(mapper = mapper, border = border, defaultChar = defaultChar, defaultSize = defaultSize) {
+        xRange.forEach ( x => yRange.forEach ( y => data(Point(x,y)) = function(x, y) ) )
+        updateXYDimensions(border)
+    }
+     */
+    
     def withMapper(mapper: Map[Char,T]): GridBuilder[T] = copy(mapper = mapper)
 
     def withBorder(border: Int): GridBuilder[T] = copy(border = border)

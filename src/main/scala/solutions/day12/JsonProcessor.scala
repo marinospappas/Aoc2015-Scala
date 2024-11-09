@@ -1,9 +1,11 @@
 package org.mpdev.scala.aoc2015
 package solutions.day12
 
-import framework.PuzzleSolver
+import framework.{InputReader, PuzzleSolver}
 
-class JsonProcessor extends PuzzleSolver {
+class JsonProcessor extends PuzzleSolver(InputReader.read(12, extension = "json")) {
+
+    private val inputData: ujson.Value = input.transform
 
     def isRedObject(jsonNode: ujson.Value): Boolean =
         jsonNode.isInstanceOf[ujson.Obj] && jsonNode.obj.values.map(_.value).toList.contains("red")
@@ -19,14 +21,14 @@ class JsonProcessor extends PuzzleSolver {
             if (node.isInstanceOf[ujson.Arr] || node.isInstanceOf[ujson.Obj])
                 processJsonIntFields(node, ignoreRed)
 
-    override def solvePart1(input: List[String]): Any =
+    override def solvePart1: Any =
         numericSum = 0
-        processJsonIntFields(input.transform, false)
+        processJsonIntFields(inputData, false)
         numericSum
 
-    override def solvePart2(input: List[String]): Any =
+    override def solvePart2: Any =
         numericSum = 0
-        processJsonIntFields(input.transform, true)
+        processJsonIntFields(inputData, true)
         numericSum
 
     extension (l: List[String])
