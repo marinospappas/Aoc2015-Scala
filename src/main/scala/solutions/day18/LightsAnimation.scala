@@ -19,15 +19,15 @@ class LightsAnimation(input: List[String]) extends PuzzleSolver {
         val (minX, maxX, minY, maxY) = grid.getMinMaxXY
         if (part == 2)
             for (p <- grid.getCorners) do grid.setDataPoint(p, LightState.ON)
+
         val newGrid = Grid(grid.getDataPoints, LightState.mapper, defaultSize = (maxX - minX + 1, maxY - minY + 1))
         for (x <- minX to maxX)
             for (y <- minY to maxY)
                 val p = Point(x, y)
-                val neighboursOn: Int = grid.getAdjacent(p, true).count( grid.getDataPoint(_) == ON )
-                if (grid.containsDataPoint(p) && grid.getDataPoint(p) == LightState.ON) {
+                val neighboursOn: Int = grid.getAdjacent(p, true).count( p => grid.getDataPointOptional(p).contains(ON) )
+                if (grid.containsDataPoint(p) && grid.getDataPoint(p) == LightState.ON)
                     if (ruleOff(neighboursOn))
-                        newGrid.setDataPoint(p, LightState.OFF)
-                }
+                        newGrid.removeDataPoint(p)
                 else if (ruleOn(neighboursOn))
                     newGrid.setDataPoint(p, LightState.ON)
 

@@ -44,13 +44,15 @@ open class Grid[T](gridData: Map[Point,T],
     def setDataPoints(dataPoints: Map[Point,T]): Unit = data.empty ++ dataPoints
 
     def getDataPoint(p: Point): T = data(p)
+    
+    def getDataPointOptional(p: Point): Option[T] = data.get(p)
 
     def setDataPoint(p: Point, t: T): Unit = data += p -> t
 
     def containsDataPoint(p: Point): Boolean = data.contains(p)
 
     def getAdjacent(p: Point, includeDiagonals: Boolean = false): Set[Point] =
-        (if (includeDiagonals) p.adjacent() else p.adjacentCardinal()).filter( p => isInsideGrid(p) ).toSet
+        (if (includeDiagonals) p.adjacent() else p.adjacentCardinal()).toSet
 
     def removeDataPoint(p: Point): Unit =
         data -= p
@@ -103,10 +105,10 @@ open class Grid[T](gridData: Map[Point,T],
             data(Point(minX + x, n)) = rowData(x)
 
     // mapping of a column or a row to int by interpreting the co-ordinates as bit positions
-    def mapRowToInt(n: Int, predicate: T => Boolean = { _ => true } ) =
+    def mapRowToInt(n: Int, predicate: T => Boolean = { _ => true } ): Int =
         data.filter( e => predicate(e._2) && e._1.y == n ).map( e => Grid.bitToInt(e._1.x) ).sum
 
-    def mapColToInt(n: Int, predicate: T => Boolean = { _ => true }) =
+    def mapColToInt(n: Int, predicate: T => Boolean = { _ => true }): Int =
         data.filter( e => predicate(e._2) && e._1.x == n ).map ( e => Grid.bitToInt(e._1.y) ).sum
 
     private def updateXYDimensions(border: Int): Unit =
@@ -121,9 +123,9 @@ open class Grid[T](gridData: Map[Point,T],
             minX = data.keys.map(_.x).min - border
             minY = data.keys.map(_.y).min - border
         else
-            maxX = 0;
-            maxY = 0;
-            minX = 0;
+            maxX = 0
+            maxY = 0
+            minX = 0
             minY = 0
         cornerPoints = Set(Point(minX, minY), Point(minX, maxY), Point(maxX, minY), Point(maxX, maxY))
 
@@ -155,6 +157,8 @@ open class Grid[T](gridData: Map[Point,T],
         println("")
 
 }
+
+
 
 object Grid {
     val allCharsDefMapper: Map[Char, Char] = (' ' to '~').map(c => c -> c).toMap

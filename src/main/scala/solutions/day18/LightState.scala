@@ -3,7 +3,6 @@ package solutions.day18
 
 enum LightState(val value: Char) {
     case ON extends LightState('#')
-    case OFF extends LightState('.')
 }
 
 object LightState {
