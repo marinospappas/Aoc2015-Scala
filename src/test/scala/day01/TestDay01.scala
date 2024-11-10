@@ -27,7 +27,8 @@ class TestDay01 extends AnyFlatSpec {
 
     it should "solve part1 correctly" in {
         forAll (part1Params) { (input: List[String], expected: Int) =>
-            solver.solvePart1(input) shouldBe expected
+            solver.input = input
+            solver.solvePart1 shouldBe expected
         }
     }
 
@@ -41,7 +42,8 @@ class TestDay01 extends AnyFlatSpec {
 
     it should "solve part2 correctly" in {
         forAll(part2Params) { (input: List[String], expected: Int) =>
-            solver.solvePart2(input) shouldBe expected
+            solver.input = input
+            solver.solvePart2 shouldBe expected
         }
     }
 }

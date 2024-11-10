@@ -1,7 +1,7 @@
 package org.mpdev.scala.aoc2015
 package framework
 
-trait PuzzleSolver(val input: List[String]) {
+trait PuzzleSolver(var input: List[String]) {
 
     def part1: (Any, Long) = {
         val start = System.currentTimeMillis()

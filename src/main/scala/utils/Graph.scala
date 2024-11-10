@@ -10,7 +10,6 @@ import scala.collection.{immutable, mutable}
 //TODO replace the Int weight with Weight<U> to be able to implement custom compare
 open class Graph[T](
                         val nodes: mutable.Map[T, mutable.Map[T, Int]] = mutable.Map(),
-                        val useCustomGetConnectedFunction: Boolean = false,
                         val customGetConnected: Option[T => Set[(T, Int)]] = Option.empty,
                         val heuristic: Option[T => Int] = Option.empty
                     ) {
@@ -65,39 +64,27 @@ open class Graph[T](
                 println(s"node $count: ${e._1} connected to: ${e._2}")
         )
 
-    /*
-        fun longestPathDfs(start: T, includeAllNodes: Boolean = true, isAtEnd: (T) -> Boolean): Int {
-            return dfsMaxPath(start, isAtEnd, mutableMapOf(), includeAllNodes)
-        }
+    def longestPathDfs(start: T, includeAllNodes: Boolean = true, isAtEnd: T => Boolean): Int =
+        dfsMaxPath(start, isAtEnd, mutable.Map(), includeAllNodes)
 
-        //TODO: refactor the below function to use Stack instead of recursion
-        private fun dfsMaxPath(cur: T, isAtEnd: (T) -> Boolean, visited: MutableMap<T, Int>, includeAllNodes: Boolean): Int {
-            if (isAtEnd(cur) &&
-                if (includeAllNodes) visited.size == nodes.size else visited.isNotEmpty()) {
-                return visited.values.sum()
-            }
-            var maxPath = Int.MIN_VALUE
-            getConnected(cur).forEach { (neighbor, steps) ->
-                if (neighbor !in visited) {
-                    visited[neighbor] = steps
-                    val res = dfsMaxPath(neighbor, isAtEnd, visited, includeAllNodes)
-                    if (res > maxPath) {
-                        maxPath = res
-                    }
-                    visited.remove(neighbor)
-                }
-            }
-            return maxPath
-     */
-    }
+    //TODO: refactor the below function to use Stack instead of recursion
+    private def dfsMaxPath(cur: T, isAtEnd: T => Boolean, visited: mutable.Map[T, Int], includeAllNodes: Boolean): Int =
+        if (isAtEnd(cur) && (if (includeAllNodes) visited.size == nodes.size else visited.nonEmpty))
+            return visited.values.sum()
+            
+        var maxPath = Int.MinValue
+        getConnected(cur).foreach ( (neighbor, steps) =>
+            if (! visited.contains(neighbor))
+                visited += neighbor -> steps
+                val res = dfsMaxPath(neighbor, isAtEnd, visited, includeAllNodes)
+                if (res > maxPath)
+                    maxPath = res
+                visited.remove(neighbor)
+        )
+        maxPath
 
-    object Graph {
+}
 
-        var aStarAlgorithm = false // flag used to distinguish between A* and Dijkstra algorithm for min cost path
-
-        //def from(g: SGraph[T]): SGraph[T] =
-        //    val newGraph = SGraph[T]()
-        //    for ((id, connxns) <- g.nodes) do newGraph.addNode(id, connxns.toMap())
-        //    newGraph
-
+object Graph {
+    var aStarAlgorithm = false // flag used to distinguish between A* and Dijkstra algorithm for min cost path
 }

@@ -12,10 +12,9 @@ import org.scalatest.prop.Tables.Table
 class TestDay12 extends AnyFlatSpec {
 
     private val solver = JsonProcessor()
-    private val input = InputReader.read(12, "src/test/resources/input", "json")
 
     it should "read json string correctly" in {
-        solver.inputValue(input).isInstanceOf[ujson.Arr] shouldBe true
+        solver.input.isInstanceOf[ujson.Arr] shouldBe true
     }
 
     private val redParams = Table(
@@ -33,10 +32,10 @@ class TestDay12 extends AnyFlatSpec {
     }
 
     it should "solve part1 correctly" in {
-        solver.solvePart1(input) shouldBe 3531
+        solver.solvePart1 shouldBe 3531
     }
 
     it should "solve part2 correctly" in {
-        solver.solvePart2(input) shouldBe 3074
+        solver.solvePart2 shouldBe 3074
     }
 }

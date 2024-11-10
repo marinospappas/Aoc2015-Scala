@@ -11,8 +11,7 @@ import org.scalatest.matchers.should.Matchers.*
 
 class TestDay18 extends AnyFlatSpec {
 
-    private val input = InputReader.read(18, "src/test/resources/input")
-    private val solver = LightsAnimation(input)
+    private val solver = LightsAnimation()
 
     it should "read input and set the grid" in {
         solver.grid.printIt()
@@ -46,12 +45,12 @@ class TestDay18 extends AnyFlatSpec {
     it should "solve part1 correctly" in {
         solver.repeatAnimation = 4
         solver.debug = true
-        solver.solvePart1(input) shouldBe 4
+        solver.solvePart1 shouldBe 4
     }
 
     it should "solve part2 correctly" in {
         solver.repeatAnimation = 5
         solver.debug = true
-        solver.solvePart2(input) shouldBe 17
+        solver.solvePart2 shouldBe 17
     }
 }
