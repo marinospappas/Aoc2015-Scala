@@ -25,7 +25,7 @@ class LightsAnimation extends PuzzleSolver(InputReader.read(18)) {
             for (y <- minY to maxY)
                 val p = Point(x, y)
                 val neighboursOn: Int = grid.getAdjacent(p, true).count( p => grid.getDataPointOptional(p).contains(ON) )
-                if (grid.containsDataPoint(p) && grid.getDataPoint(p) == LightState.ON)
+                if (grid.getDataPointOptional(p).contains(LightState.ON))
                     if (ruleOff(neighboursOn))
                         newGrid.removeDataPoint(p)
                 else if (ruleOn(neighboursOn))
