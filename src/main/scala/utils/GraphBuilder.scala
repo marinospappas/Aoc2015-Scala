@@ -4,18 +4,17 @@ package utils
 import scala.collection.mutable
 
 case class GraphBuilder[T](
-                               nodes: Map[T, mutable.Map[T, Int]] = Map(),
-                               customGetConnected: Option[T => Set[(T, Int)]] = Option.empty,
-                               heuristic: Option[T => Int] = Option.empty
+                               nodes: Map[T, mutable.Map[T, Int]] = Map[T, mutable.Map[T, Int]](),
+                               customGetConnected: Option[T => Set[(T, Int)]] = Option.empty[T => Set[(T, Int)]],
+                               heuristic: Option[T => Int] = Option.empty[T => Int]
                            ) {
 
-    def fromNodesMap(graphNodes: Map[T, mutable.Map[T, Int]]): GraphBuilder[T] = copy(nodes = nodes)
+    def fromNodesListWithCost(nodesList: List[(T, Set[(T, Int)])]): GraphBuilder[T] = copy(nodes =
+        nodesList.map( n => n._1 -> mutable.Map(n._2.map( c => c._1 -> c._2 ).toSeq*) ).toMap
+    )
 
     def fromNodesList(nodesList: List[(T, Set[T])]): GraphBuilder[T] = copy(nodes =
-        nodesList.map( n =>
-            val connected = n._2.map( c => c -> 1 )
-            n._1 -> mutable.Map(connected.toSeq*)
-        ).toMap
+        nodesList.map( n => n._1 -> mutable.Map(n._2.map( c => c -> 1 ).toSeq*) ).toMap
     )
 
     def fromGraph(graph: Graph[T]): GraphBuilder[T] = 

@@ -3,9 +3,9 @@ package solutions.day02
 
 import framework.{InputReader, PuzzleSolver}
 
-class PresentWrapping extends PuzzleSolver(InputReader.read(2)) {
+class PresentWrapping extends PuzzleSolver {
 
-    private val inputData: List[Parcel] = input.transform
+    private val inputData: List[Parcel] = InputReader.read(2).transform
 
     override def solvePart1: Any =
         inputData.map(p => p.area() + p.extra()).sum

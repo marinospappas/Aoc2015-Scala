@@ -1,20 +1,21 @@
 package org.mpdev.scala.aoc2015
 package day12
 
-import framework.InputReader
+import framework.{AocMain, InputReader}
 import solutions.day12.JsonProcessor
 
-import org.scalatest.prop.TableDrivenPropertyChecks._
+import org.scalatest.prop.TableDrivenPropertyChecks.*
 import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.prop.Tables.Table
 
 class TestDay12 extends AnyFlatSpec {
 
+    AocMain.environment = "test"
     private val solver = JsonProcessor()
 
     it should "read json string correctly" in {
-        solver.input.isInstanceOf[ujson.Arr] shouldBe true
+        solver.inputData.isInstanceOf[ujson.Arr] shouldBe true
     }
 
     private val redParams = Table(

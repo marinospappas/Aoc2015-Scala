@@ -3,14 +3,15 @@ package day01
 
 import solutions.day01.ElevatorButtons
 
-import org.scalatest.prop.TableDrivenPropertyChecks._
+import framework.AocMain
+import org.scalatest.prop.TableDrivenPropertyChecks.*
 import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.prop.Tables.Table
 
 class TestDay01 extends AnyFlatSpec {
 
-    val solver = ElevatorButtons()
+    AocMain.environment = "none"
 
     private val part1Params = Table(
         ("input", "expected"),
@@ -27,7 +28,7 @@ class TestDay01 extends AnyFlatSpec {
 
     it should "solve part1 correctly" in {
         forAll (part1Params) { (input: List[String], expected: Int) =>
-            solver.input = input
+            val solver = ElevatorButtons(input)
             solver.solvePart1 shouldBe expected
         }
     }
@@ -42,7 +43,7 @@ class TestDay01 extends AnyFlatSpec {
 
     it should "solve part2 correctly" in {
         forAll(part2Params) { (input: List[String], expected: Int) =>
-            solver.input = input
+            val solver = ElevatorButtons(input)
             solver.solvePart2 shouldBe expected
         }
     }

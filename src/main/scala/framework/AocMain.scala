@@ -5,6 +5,10 @@ private def usage(): Unit =
     System.err.println("usage: AoCMain #day")
     System.exit(1)
 
+object AocMain {
+    var environment = "prod"
+}
+
 @main
 def aoc2024(args: String*): Unit =
     if (args.isEmpty)

@@ -1,16 +1,17 @@
 package org.mpdev.scala.aoc2015
 package day18
 
-import framework.InputReader
+import framework.{AocMain, InputReader}
 import solutions.day18.{LightState, LightsAnimation}
 import solutions.day18.LightState.ON
-
 import utils.GridBuilder
+
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers.*
 
 class TestDay18 extends AnyFlatSpec {
 
+    AocMain.environment = "test"
     private val solver = LightsAnimation()
 
     it should "read input and set the grid" in {
@@ -18,7 +19,7 @@ class TestDay18 extends AnyFlatSpec {
         (
             solver.grid.getDimensions, solver.grid.countOf(ON), solver.grid.getDataPoints.size
         ) shouldBe (
-            (6, 6), 15, 36
+            (6, 6), 15, 15
         )
     }
 

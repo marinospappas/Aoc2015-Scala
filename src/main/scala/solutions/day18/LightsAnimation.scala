@@ -5,9 +5,9 @@ import utils.{Grid, GridBuilder, Point}
 import framework.{InputReader, PuzzleSolver}
 import solutions.day18.LightState.ON
 
-class LightsAnimation extends PuzzleSolver(InputReader.read(18)) {
+class LightsAnimation extends PuzzleSolver {
 
-    var grid: Grid[LightState] = input.transform()
+    var grid: Grid[LightState] = InputReader.read(18).transform()
     var repeatAnimation = 100
     var debug = false
 

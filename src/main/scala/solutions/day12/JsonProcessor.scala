@@ -3,9 +3,9 @@ package solutions.day12
 
 import framework.{InputReader, PuzzleSolver}
 
-class JsonProcessor extends PuzzleSolver(InputReader.read(12, extension = "json")) {
+class JsonProcessor extends PuzzleSolver {
 
-    private val inputData: ujson.Value = input.transform
+    val inputData: ujson.Value = InputReader.read(12, extension = "json").transform
 
     def isRedObject(jsonNode: ujson.Value): Boolean =
         jsonNode.isInstanceOf[ujson.Obj] && jsonNode.obj.values.map(_.value).toList.contains("red")

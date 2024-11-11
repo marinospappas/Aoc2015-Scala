@@ -1,7 +1,7 @@
 package org.mpdev.scala.aoc2015
 package utils
 
-import scala.collection.{immutable, mutable}
+import scala.collection.mutable
 
 /**
  * graph class
@@ -9,9 +9,9 @@ import scala.collection.{immutable, mutable}
  */
 //TODO replace the Int weight with Weight<U> to be able to implement custom compare
 open class Graph[T](
-                        val nodes: mutable.Map[T, mutable.Map[T, Int]] = mutable.Map(),
-                        val customGetConnected: Option[T => Set[(T, Int)]] = Option.empty,
-                        val heuristic: Option[T => Int] = Option.empty
+                        val nodes: mutable.Map[T, mutable.Map[T, Int]] = mutable.Map[T, mutable.Map[T, Int]](),
+                        val customGetConnected: Option[T => Set[(T, Int)]] = Option.empty[T => Set[(T, Int)]],
+                        val heuristic: Option[T => Int] = Option.empty[T => Int]
                     ) {
 
     private val customFunction: T => Set[(T, Int)] = if (customGetConnected.nonEmpty) customGetConnected.get else { T => Set() }
@@ -57,8 +57,8 @@ open class Graph[T](
         nodes.flatMap(n => n._2.map(c => Set(n._1, c._1))).toSet
 
     def printIt(): Unit =
-        var count = 1
-        println("SGraph")
+        var count = 0
+        println("[Graph]")
         nodes.foreach( e =>
                 count += 1
                 println(s"node $count: ${e._1} connected to: ${e._2}")
@@ -82,7 +82,7 @@ open class Graph[T](
                 visited.remove(neighbor)
         )
         maxPath
-
+        
 }
 
 object Graph {
