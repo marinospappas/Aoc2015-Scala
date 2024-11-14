@@ -7,8 +7,8 @@ import scala.io.Source.fromFile
 object InputReader {
 
     private val filePattern = AocMain.environment match
-        case "prod" => "src/main/resources/input"
-        case _ => "src/test/resources/input"
+        case "prod" => "src/main/resources/input/input"
+        case _ => "src/test/resources/input/input"
 
     def read(day: Int, pattern: String = filePattern, extension: String = "txt"): List[String] = {
         if (AocMain.environment == "none")

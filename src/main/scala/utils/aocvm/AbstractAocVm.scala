@@ -1,9 +1,16 @@
-package org.mpdev.scala.aoc2015.utils.aocvm
+package org.mpdev.scala.aoc2015
+package utils.aocvm
 
+import utils.aocvm.ProgramState.{COMPLETED, RUNNING}
+
+import utils.aocvm.AbstractAocVm.WAIT_PRG_TIMEOUT
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+import java.util.concurrent.TimeUnit
 import scala.collection.mutable.ArrayBuffer
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration.Duration
 
 abstract class AbstractAocVm(instructionList: List[String], val instanceNamePrefix: String) {
 
@@ -18,71 +25,68 @@ abstract class AbstractAocVm(instructionList: List[String], val instanceNamePref
         setupNewInstance(instructionList)
     }
 
-    object AbstractAocVm {
-        val DEF_PROG_INSTANCE_PREFIX = "aocprog"
-    }
-
     protected def setupNewInstance(instructionList: List[String]): Int =
-        val ioChannels = ArrayBuffer[Channel[Long]](Channel[Long](), Channel[Long]())
+        val ioChannels = List[IoChannel[Long]](IoChannel[Long](), IoChannel[Long]())
         instanceTable += AocInstance(Program(instructionList, ioChannels), ioChannels)
-        val programId = instanceTable.size
+        val programId = instanceTable.size - 1
         instanceTable(programId).program.instanceName = s"$instanceNamePrefix-$programId"
         log.info(s"AocCode instance [$programId] configured")
         programId
 
-    /*protected def aocCtl(programId: Int, cmd: AocCmd, value: Any): Unit
-        cmd match
-            case AocCmd.SET_OUTPUT_BUFFER_SIZE => instanceTable(progarmId).ioChannels(1) = Channel(value.asInstanceOf[Int])*/
+    protected def aocCtl(programId: Int, cmd: AocCmd, value: Any): Unit =
+        ;
+        // todo: cmd match
+        //           case AocCmd.SET_OUTPUT_BUFFER_SIZE => instanceTable(progarmId).ioChannels(1) = Channel(value.asInstanceOf[Int])
 
     /// protected / internal functions
-    //suspend
-    def runAocProgram(programId: Int, initReg: Map[String, Long] = Map()): Unit =
+    def runAocProgram(programId: Int, initReg: Map[String, Long] = Map()): Future[Int] =
         instanceTable(programId).program.run(initReg)
 
-    protected def aocProgramIsRunning(programId: Int) =
+    def runAocProgramAndWait(programId: Int, initReg: Map[String, Long] = Map()): Unit =
+        Await.result(runAocProgram(programId, initReg), Duration.apply(WAIT_PRG_TIMEOUT, TimeUnit.SECONDS))
+
+    protected def aocProgramIsRunning(programId: Int): Boolean =
         instanceTable(programId).program.programState != COMPLETED
 
-    protected /*suspend*/ def waitAocProgram(/*job: Job*/): Unit =
+    protected def waitAocProgram(/*job: Job*/): Unit =
         // TODO job.join()
-        return
+        ;
 
-    protected /*suspend*/ def setProgramInput(data: List[Long], programId: Int): Unit =
-        log.debug("set program input to {}", data)
-        setInputValues(data, instanceTable(programId).ioChannels[0])
+    protected def setProgramInput(data: List[Long], programId: Int): Unit =
+        log.debug(s"set program input to ${data.mkString(", ")}")
+        setInputValues(data, instanceTable(programId).ioChannels.head)
 
-    protected /*suspend*/ def getProgramFinalOutputLong(programId: Int): List[Long] =
+    protected def getProgramFinalOutputLong(programId: Int): List[Long] =
         log.debug("getProgramFinalOutputLong called")
-        delay(1)      // required in case the program job is still waiting for input
-        while (instanceTable[programId].program.programState == RUNNING) {     // job active = still producing output
-            delay(1)
+        Thread.sleep(1)      // required in case the program job is still waiting for input
+        while (instanceTable(programId).program.programState == RUNNING) {     // job active = still producing output
+            Thread.sleep(1)
         }
-        val output = getOutputValues(instanceTable[programId].ioChannels[1])
-        log.debug("returning output: {}", output)
+        val output = getOutputValues(instanceTable(programId).ioChannels(1))
+        log.debug(s"returning output: ${output.mkString(", ")}")
         output
 
-    protected /*suspend*/ def getProgramAsyncOutputLong(programId: Int): List[Long] =
+    protected def getProgramAsyncOutputLong(programId: Int): List[Long] =
         log.debug("getProgramAsyncOutputLong called")
         val outputValues = ArrayBuffer[Long]()
-        outputValues.add(instanceTable[programId].ioChannels[1].receive())
-        while (!instanceTable[programId].ioChannels[1].isEmpty) {
-            outputValues.add(instanceTable[programId].ioChannels[1].receive())
+        outputValues += instanceTable(programId).ioChannels(1).receive
+        while (!instanceTable(programId).ioChannels(1).isEmpty) {
+            outputValues += instanceTable(programId).ioChannels(1).receive
         }
-        log.debug("returning output: {}", outputValues)
-        outputValues
+        log.debug(s"returning output: ${outputValues.mkString(", ")}")
+        outputValues.toList
 
-    private /*suspend*/ def setInputValues(values: List[Long], inputChannel: Channel[Long]) =
-        values.forEach(inputChannel.+= _)
+    private  def setInputValues(values: List[Long], inputChannel: IoChannel[Long]): Unit =
+        values.foreach(inputChannel.send)
 
-    private /*suspend*/ def getOutputValues(outputChannel: Channel[Long]): List[Long] =
+    private  def getOutputValues(outputChannel: IoChannel[Long]): List[Long] =
         val outputValues = ArrayBuffer[Long]()
-        outputValues.+=(outputChannel.receive())
-        do {
-            val nextItem = outputChannel.tryReceive().getOrNull()
-            if (nextItem != null)
-                outputValues.add(nextItem)
-        } while(nextItem != null)
-        outputValues
-    }
+        outputValues += outputChannel.receive
+        while (!outputChannel.isEmpty) {
+            outputValues += outputChannel.receive
+        }
+        log.debug(s"returning output: ${outputValues.mkString(", ")}")
+        outputValues.toList
 
     protected def setProgramMemory(programId: Int, address: Int, data: Long): Unit =
         instanceTable(programId).program.setMemory(address, data)
@@ -102,9 +106,14 @@ abstract class AbstractAocVm(instructionList: List[String], val instanceNamePref
     protected def getProgramRegister(programId: Int, reg: String): Int =
         getProgramRegisterLong(programId, reg).toInt
 
-    case class AocInstance(program: Program, ioChannels: ArrayBuffer[Channel[Long]])
+    case class AocInstance(program: Program, ioChannels: List[IoChannel[Long]])
 
     enum AocCmd {
         case SET_OUTPUT_BUFFER_SIZE
     }
+}
+
+object AbstractAocVm {
+    val DEF_PROG_INSTANCE_PREFIX: String = "aocprog"
+    val WAIT_PRG_TIMEOUT = 10
 }

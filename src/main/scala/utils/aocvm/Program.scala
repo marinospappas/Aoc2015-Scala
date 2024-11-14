@@ -11,10 +11,12 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.util.boundary
 import boundary.break
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
-class Program(prog: List[String], ioChannel: List[Channel[Long]] = List[Channel[Long]]()) {
+class Program(prog: List[String], ioChannel: List[IoChannel[Long]] = List[IoChannel[Long]]()) {
 
-    private val log: Logger = LoggerFactory.getLogger("Program")
+    private val log: Logger = LoggerFactory.getLogger(classOf[Program])
     var programState: ProgramState = READY
     var instanceName = ""
 
@@ -29,48 +31,51 @@ class Program(prog: List[String], ioChannel: List[Channel[Long]] = List[Channel[
 
     private val instructionList: ArrayBuffer[(OpCode, List[Any])] =
         prog.filterNot ( line => line.startsWith("#") || line.isEmpty )
-            .map ( _.substring(if (sourcePgmOptions("indent") == null) 0 else sourcePgmOptions("indent").toInt ) )
+            .map ( _.substring(if (sourcePgmOptions.get("indent") == Option.empty) 0 else sourcePgmOptions("indent").toInt ) )
             .map ( _.split(" ") )
             .map ( x => (InstructionSet.opCodeFomString(x(0)), x.toList.slice(1, x.length).map ( v => v.toIntOrString )) )
             .to(ArrayBuffer)
 
     private val registers = mutable.Map[String, Long]().withDefaultValue(0)
 
-    //suspend
-    def run(initReg: Map[String, Long] = Map(), maxCount: Int = Int.MaxValue): Unit =
-        log.debug("$instanceName starting, init registers: $initReg")
+    def run(initReg: Map[String, Long] = Map(), maxCount: Int = Int.MaxValue): Future[Int] = Future[Int] {
+        log.info(s"$instanceName started${if (initReg.nonEmpty) ", init registers:" else ""} ${initReg.mkString}")
         var pc: Int = 0
         var outputCount: Int = 0
         registers.clear()
-        initReg.foreach( (reg, v) => registers(reg) = v )
+        initReg.foreach((reg, v) => registers(reg) = v)
         boundary:
-            while (pc <= instructionList.size && outputCount < maxCount)
+            while (pc < instructionList.size && outputCount < maxCount) {
                 val (instr, params) = instructionList(pc)
                 val mappedParams = mapParams(params, instr.paramMode, instr.numberOfParams)
-                log.debug("$instanceName pc: $pc instruction: ${instr.code} $mappedParams")
+                log.debug(s"$instanceName pc: $pc instruction: ${instr.code} ${mappedParams.mkString(", ")}")
                 val (resCode, values) = instr.execute(mappedParams)
-                log.debug("$instanceName     result: $resCode $values")
-                resCode match
-                    case SET_MEMORY => registers(values.head.asInstanceOf[String]) = valueOf(values(1)).asInstanceOf[Long]
-                    case INCR_PC => pc += valueOf(values.head.asInstanceOf[Int]).asInstanceOf[Int] - 1
+                log.debug(s"$instanceName     result: $resCode ${values.mkString(", ")}")
+                resCode match {
+                    case SET_MEMORY => registers(values.head.asInstanceOf[String]) = valueOf(values(1))
+                    case INCR_PC => pc += valueOf(values.head).toInt - 1
                     case OUTPUT =>
-                        log.debug("AocProg {} writing to output {}", instanceName, values.head)
+                        log.debug(s"AocProg $instanceName writing to output ${values.head}")
                         ioChannel(1).send(valueOf(values.head))
                         outputCount += 1
                     case INPUT =>
                         programState = WAIT
-                        log.debug("AocProg {} waiting for input will be stored in {}", instanceName, values.head)
+                        log.debug(s"AocProg $instanceName waiting for input will be stored in ${values.head}")
                         // will be suspended below and the value in retCode may change
-                        val inputValue = ioChannel.head.receive()
+                        val inputValue = ioChannel.head.receive
                         registers(values.head.asInstanceOf[String]) = inputValue
                         programState = RUNNING
-                        log.debug("AocProg {} received input {} to be stored in {}", instanceName, inputValue, values.head)
+                        log.debug(s"AocProg $instanceName received input $inputValue to be stored in ${values.head}")
                     case CUSTOM => values.head.asInstanceOf[CustomOpCode].execute(instructionList, pc, values)
                     case EXIT => break()
                     case NONE => ;
-            pc += 1
-
+                }
+                pc += 1
+            }
         programState = COMPLETED
+        log.info(s"$instanceName completed")
+        0
+    }
 
 
     def getRegister(reg: String): Long = registers(reg)
@@ -79,9 +84,9 @@ class Program(prog: List[String], ioChannel: List[Channel[Long]] = List[Channel[
     def getMemory(address: Int): Long = getRegister(address.toString)
     def setMemory(address: Int, value: Long): Unit = setRegister(address.toString, value)
 
-    private def valueOf(x: Any): Any =
+    private def valueOf(x: Any): Long =
         x match
-            case i: Int => i
+            case i: Int => i.toLong
             case l: Long => l
             case s: String => registers(s)
 

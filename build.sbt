@@ -8,6 +8,7 @@ lazy val root = (project in file("."))
     idePackagePrefix := Some("org.mpdev.scala.aoc2015")
   )
 
-libraryDependencies += "org.scala-lang" %% "toolkit" % "0.1.7"
+libraryDependencies += "org.scala-lang" %% "toolkit" % "0.4.0"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.19" % "test"
+libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.5.6"
 
