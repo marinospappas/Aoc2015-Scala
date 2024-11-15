@@ -3,10 +3,6 @@ package solutions.day21
 
 case class Player(var name: String, var hitPoints: Int, var damageStrength: Int, var armourStrength: Int) {
 
-    def this(weapon: Weapon, armour: Armour, rings: List[Ring], name: String = "", hitPoints: Int = 0) =
-        this(name, hitPoints, weapon.damage + rings.map( _.damage ).sum, armour.armour + rings.map( _.armour ).sum)
-        cost = weapon.cost + armour.cost + rings.map(_.cost).sum
-
     var cost: Int = 0
 
     def defend(player2: Player): Unit =

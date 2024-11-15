@@ -20,7 +20,7 @@ class FightGame extends PuzzleSolver {
         // player 2 attacks (if still standing)
         player1.defend(player2)
         if (player1.hitPoints <= 0) -1   // player 2 wins
-        else 0   // fight is stil on
+        else 0   // fight is still on
 
     def playGame(player1: Player, player2: Player): Int =
         var result = 0
