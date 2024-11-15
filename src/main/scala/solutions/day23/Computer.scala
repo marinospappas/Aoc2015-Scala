@@ -16,19 +16,15 @@ class Computer extends PuzzleSolver {
 
     override def solvePart1: Any =
         aocVm.sendInputToProgram(0)
-        aocVm.sendInputToProgram(id, 1)
         aocVm.runProgram()
-        aocVm.runAocProgram(id)
-        log.info("part 1 solved")
-        val x = aocVm.getFinalOutputFromProgram.last
-        val y = aocVm.getFinalOutputFromProgram(1).last
-        log.info(s"result -> $x, $y")
-        x
+        aocVm.waitForProgram()
+        aocVm.getFinalOutputFromProgram.last
 
     override def solvePart2: Any =
-        aocVm.sendInputToProgram(id, 1)
-        aocVm.runAocProgram(id)
-        aocVm.getFinalOutputFromProgram(id).last.toInt
+        aocVm.sendInputToProgram(1)
+        aocVm.runProgram()
+        aocVm.waitForProgram()
+        aocVm.getFinalOutputFromProgram.last
 
     extension(l: List[String])
         private def transform(): List[String] =

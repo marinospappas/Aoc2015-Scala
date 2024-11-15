@@ -42,15 +42,18 @@ abstract class AbstractAocVm(instructionList: List[String], val instanceNamePref
     def runAocProgram(programId: Int, initReg: Map[String, Long] = Map()): Future[Int] =
         instanceTable(programId).program.run(initReg)
 
+    // TODO: implement wait for program that has been started asynchronously
+
     def runAocProgramAndWait(programId: Int, initReg: Map[String, Long] = Map()): Unit =
         Await.result(runAocProgram(programId, initReg), Duration.apply(WAIT_PRG_TIMEOUT, TimeUnit.SECONDS))
 
     protected def aocProgramIsRunning(programId: Int): Boolean =
         instanceTable(programId).program.programState != COMPLETED
 
-    protected def waitAocProgram(/*job: Job*/): Unit =
-        // TODO job.join()
-        ;
+    protected def waitForAocProgram(programId: Int): Unit =
+        while (instanceTable(programId).program.programState == RUNNING) {
+            Thread.sleep(5)
+        }
 
     protected def setProgramInput(data: List[Long], programId: Int): Unit =
         log.debug(s"set program input to ${data.mkString(", ")}")
@@ -59,9 +62,7 @@ abstract class AbstractAocVm(instructionList: List[String], val instanceNamePref
     protected def getProgramFinalOutputLong(programId: Int): List[Long] =
         log.debug("getProgramFinalOutputLong called")
         Thread.sleep(1)      // required in case the program job is still waiting for input
-        while (instanceTable(programId).program.programState == RUNNING) {     // job active = still producing output
-            Thread.sleep(1)
-        }
+        waitForAocProgram(programId)
         val output = getOutputValues(instanceTable(programId).ioChannels(1))
         log.debug(s"returning output: ${output.mkString(", ")}")
         output

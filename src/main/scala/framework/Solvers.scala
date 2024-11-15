@@ -10,11 +10,12 @@ import solutions.day09.ShortestAndLongestRoute
 import solutions.day05.StringsInspection
 import solutions.day07.DigitalCircuit
 import solutions.day23.Computer
+import solutions.day21.FightGame
 
 val solvers = Map(
     1 -> ElevatorButtons(), 2 -> PresentWrapping(), 4 -> Mad5HashProcessor(), 5 -> StringsInspection(),
     7 -> DigitalCircuit(),
     9 -> ShortestAndLongestRoute(), 12 -> JsonProcessor(),
     18 -> LightsAnimation(),
-    23 -> Computer()
+    21 -> FightGame(), 23 -> Computer()
 )
