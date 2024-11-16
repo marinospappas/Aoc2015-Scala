@@ -7,8 +7,8 @@ class MinCostPath[T] {
     var minCost: Int = Int.MaxValue
     var numberOfIterations: Int = 0
 
-    def printPath(minCostPath: MinCostPath[T]): Unit =
-        println(s"path,cost: ${minCostPath.path}")
-        println(s"min cost: ${minCostPath.minCost}")
+    def printPath(): Unit =
+        println(s"path,cost: $path")
+        println(s"min cost: $minCost")
     
 }

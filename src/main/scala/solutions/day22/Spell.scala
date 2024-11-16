@@ -2,11 +2,11 @@ package org.mpdev.scala.aoc2015
 package solutions.day22
 
 enum Spell(val cost: Int, val effect: Effect) {
-    case MAGIC_MISSILE extends Spell(53, Effect(0, atStart = (_, p2) => p2.hitPoints -= 4))
-    case DRAIN extends Spell(73, Effect(0, atStart = (p1, p2) => { p2.hitPoints -= 2; p1.hitPoints += 2 }))
-    case SHIELD extends Spell(113, Effect(6, atStart = (p1, _) => p1.armourStrength += 7, atEnd = (p1, _) => p1.armourStrength -= 7))
-    case POISON extends Spell(173, Effect(6, whileActive = (_, p2) => p2.hitPoints -= 3))
-    case RECHARGE extends Spell(173, Effect(5, whileActive = (p1, _) => p1.cash += 101)
+    case MAGIC_MISSILE extends Spell(53,  Effect("MM", atStart = (_, p2) => p2.hitPoints -= 4))
+    case DRAIN         extends Spell(73,  Effect("DR", atStart = (p1, p2) => { p2.hitPoints -= 2; p1.hitPoints += 2 }))
+    case SHIELD        extends Spell(113, Effect("SH", 6, atStart = (p1, _) => p1.armourStrength += 7, atEnd = (p1, _) => p1.armourStrength -= 7))
+    case POISON        extends Spell(173, Effect("PO", 6, whileActive = (_, p2) => p2.hitPoints -= 3))
+    case RECHARGE      extends Spell(229, Effect("RE", 5, whileActive = (p1, _) => p1.cash += 101)
     )
 }
 
@@ -19,8 +19,11 @@ enum Spell(val cost: Int, val effect: Effect) {
 // Recharge costs 229 mana. It starts an effect that lasts for 5 turns.
 //      At the start of each turn while it is active, it gives you 101 new mana.
 
-class Effect(var timer: Int = 0,
-             val atStart: (Player, Player) => Unit = (p1, p2) => (),
-             val whileActive: (Player, Player) => Unit = (p1,p2) => (),
-             val atEnd: (Player, Player) => Unit = (p1,p2) => ()
-           )
+case class Effect(id: String,
+                  var timer: Int = 0,
+                  atStart: (Player, Player) => Unit = (p1, p2) => (),
+                  whileActive: (Player, Player) => Unit = (p1, p2) => (),
+                  atEnd: (Player, Player) => Unit = (p1, p2) => ()
+                 ) {
+    override def toString: String = s"Effect($id, remaining timer: $timer)"
+}

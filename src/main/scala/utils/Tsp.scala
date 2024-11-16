@@ -1,9 +1,9 @@
 package org.mpdev.scala.aoc2015
 package utils
 
-private var iterations = 0
-
 class Tsp[T](g: Graph[T]) {
+
+    private var iterations = 0
 
     def tspMinPath(start: T, returnToStart: Boolean = false): MinCostPath[T] =
         iterations = 0

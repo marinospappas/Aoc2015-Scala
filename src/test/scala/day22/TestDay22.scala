@@ -4,11 +4,16 @@ package day22
 import framework.AocMain
 import solutions.day22.{Player, WizardGame}
 
-import solutions.day22.Spell.{MAGIC_MISSILE, POISON}
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
+import solutions.day22.Spell.*
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers.*
 
 class TestDay22 extends AnyFlatSpec {
+
+    val log: Logger = LoggerFactory.getLogger(classOf[TestDay22])
 
     AocMain.environment = "test"
     private val solver = WizardGame()
@@ -20,20 +25,37 @@ class TestDay22 extends AnyFlatSpec {
         (solver.boss.hitPoints, solver.boss.damageStrength) shouldBe (13, 8)
     }
 
-    it should "play the game correctly" in {
+    it should "play the game correctly 1st scenario" in {
         val me = Player("Me", 250, 10)
         val spells = List(POISON, MAGIC_MISSILE)
-        println(me)
-        println(solver.boss)
+        log.info(s"$me")
+        log.info(s"${solver.boss}")
         var result = 0
         for (i <- 0 to 1)
-            result = solver.playRound(me, spells(i), solver.boss)
-            println(s"Round >>> $i")
-            println(me)
-            println(solver.boss)
-            println(solver.effects)
-            println(s"result $result")
-        (result, me.hitPoints, solver.boss.hitPoints) shouldBe (1, 2, 0)
+            log.info(s"Round >>> $i")
+            result = solver.playRound(me, spells(i), solver.boss, solver.effects)
+            log.info(s"$me")
+            log.info(s"${solver.boss}")
+            log.info(s"${solver.effects}")
+            log.info(s"result $result")
+        (result, me.hitPoints, me.armourStrength, solver.boss.hitPoints) shouldBe (1, 2, 0, 0)
+    }
+
+    it should "play the game correctly - 2nd scenario" in {
+        val me = Player("Me", 250, 10)
+        val boss = Player("Boss", 0, 14, 8)
+        val spells = List(RECHARGE, SHIELD, DRAIN, POISON, MAGIC_MISSILE)
+        println(me)
+        println(boss)
+        var result = 0
+        for (i <- 0 to 4)
+            log.info(s"Round >>> $i")
+            result = solver.playRound(me, spells(i), boss, solver.effects)
+            log.info(s"$me")
+            log.info(s"$boss")
+            log.info(s"${solver.effects}")
+            log.info(s"result $result")
+        (result, me.hitPoints, me.armourStrength, boss.hitPoints) shouldBe(1, 1, 0, -1)
     }
 
     it should "solve part1 correctly" in {
