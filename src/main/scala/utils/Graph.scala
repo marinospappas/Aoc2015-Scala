@@ -10,17 +10,13 @@ import scala.collection.mutable
 //TODO replace the Int weight with Weight<U> to be able to implement custom compare
 open class Graph[T](
                         val nodes: mutable.Map[T, mutable.Map[T, Int]] = mutable.Map[T, mutable.Map[T, Int]](),
-                        val customGetConnected: Option[T => Set[(T, Int)]] = Option.empty[T => Set[(T, Int)]],
-                        val heuristic: Option[T => Int] = Option.empty[T => Int]
+                        val customGetConnected: (T => Set[(T, Int)]) | Null = null,
+                        val heuristic: (T => Int) | Null = null
                     ) {
-
-    private val customFunction: T => Set[(T, Int)] = if (customGetConnected.nonEmpty) customGetConnected.get else { T => Set() }
-
+    
     def getConnected(id: T): Set[(T, Int)] =
-        if (!nodes.contains(id))
-            Set()
-        else if (customGetConnected.nonEmpty)
-            customFunction(id)
+        if (customGetConnected != null)
+            customGetConnected(id)
         else
             nodes(id).map(e => (e._1, e._2)).toSet
 
@@ -29,6 +25,9 @@ open class Graph[T](
     def getNodes: List[T] = nodes.keys.toList
 
     def getNodesAndConnections: List[(T, mutable.Map[T, Int])] = nodes.toList
+
+    def addNode(id: T): Unit =
+        addNodesWithCost(id, Set())
 
     def addNode(id: T, connected: T, connectBothWays: Boolean = false): Unit =
         addNodesWithCost(id, Set((connected, 1)), connectBothWays)

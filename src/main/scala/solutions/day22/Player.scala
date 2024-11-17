@@ -6,3 +6,7 @@ case class Player(name: String, var cash: Int = 0, var hitPoints: Int = 0, var d
         val damageSuffered = player2.damageStrength - armourStrength
         hitPoints -= (if (damageSuffered < 0) 1 else damageSuffered )
 }
+
+object Player {
+    def newPlayer(p: Player): Player = Player(p.name, p.cash, p.hitPoints, p.damageStrength, p.armourStrength)
+}

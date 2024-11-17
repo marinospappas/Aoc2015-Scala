@@ -9,12 +9,15 @@ import scala.collection.mutable.ArrayBuffer
 import scala.util.boundary
 import boundary.break
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
 class Djikstra[T](g: Graph[T]) {
 
+    val log: Logger = LoggerFactory.getLogger("Djikstra")
+
     Graph.aStarAlgorithm = false // ensure dijkstra is used
-
-    def setAStar(): Unit = Graph.aStarAlgorithm = true
-
+    
     /**
      * Dijkstra algorithm
      */
@@ -40,6 +43,9 @@ class Djikstra[T](g: Graph[T]) {
                 return minCostPath
             }
             // else for each connected node
+            log.debug(s"++++ next states from $currentNodeId: ")
+            for (next <- g.getConnected(currentNodeId)) do
+                log.debug(s"++++      $next")
             boundary:
                 for (connectedNode <- g.getConnected(currentNodeId)) do
                     val nextPathNode = GraphPathNode(connectedNode._1, connectedNode._2)
@@ -58,7 +64,7 @@ class Djikstra[T](g: Graph[T]) {
                         // and put the updated new node back into the priority queue
                         priorityQueue.add(nextPathNode)
         }
-        //dijkstraCost.pathMap.forEach( println(_) )
+        dijkstraCost.pathMap.foreach( println(_) )
         throw AoCException(s"no path found from $start to endState")
     }
 }

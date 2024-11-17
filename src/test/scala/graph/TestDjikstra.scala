@@ -27,6 +27,7 @@ class TestDjikstra extends AnyFlatSpec {
     it should "find minimum path in simple graph" in {
         val result = Djikstra[String](graph).minPath("1", id => id == "7")
         result.printPath()
+        (result.minCost, result.path.size) shouldBe (7, 5)
     }
     
 }
