@@ -43,9 +43,6 @@ class Djikstra[T](g: Graph[T]) {
                 return minCostPath
             }
             // else for each connected node
-            log.debug(s"++++ next states from $currentNodeId: ")
-            for (next <- g.getConnected(currentNodeId)) do
-                log.debug(s"++++      $next")
             boundary:
                 for (connectedNode <- g.getConnected(currentNodeId)) do
                     val nextPathNode = GraphPathNode(connectedNode._1, connectedNode._2)

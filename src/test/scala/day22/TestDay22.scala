@@ -32,16 +32,11 @@ class TestDay22 extends AnyFlatSpec {
         val me = Player("Me", 250, 10)
         val spells = List(POISON, MAGIC_MISSILE)
         val effects: ArrayBuffer[Effect] = ArrayBuffer()
-        log.info(s"$me")
-        log.info(s"${solver.boss}")
+        log.info(s"Start: $me - ${solver.boss}")
         var result = 0
         for (i <- 0 to 1)
             log.info(s"Round >>> $i")
             result = solver.playRound(me, spells(i), solver.boss, effects)
-            log.info(s"$me")
-            log.info(s"${solver.boss}")
-            log.info(s"$effects")
-            log.info(s"result $result")
         (result, me.hitPoints, me.armourStrength, solver.boss.hitPoints) shouldBe (1, 2, 0, 0)
     }
 
@@ -56,10 +51,6 @@ class TestDay22 extends AnyFlatSpec {
         for (i <- 0 to 4)
             log.info(s"Round >>> $i")
             result = solver.playRound(me, spells(i), boss, effects)
-            log.info(s"$me")
-            log.info(s"$boss")
-            log.info(s"$effects")
-            log.info(s"result $result")
         (result, me.hitPoints, me.armourStrength, boss.hitPoints) shouldBe(1, 1, 0, -1)
     }
 

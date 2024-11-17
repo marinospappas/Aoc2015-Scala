@@ -11,20 +11,17 @@ package solutions.day22
 //      At the start of each turn while it is active, it gives you 101 new mana.
 enum Spell(val cost: Int,
            var duration: Int,
-           val atStart: (Player, Player) => Unit = (p1, p2) => (),
-           val whileActive: (Player, Player) => Unit = (p1, p2) => (),
-           val atEnd: (Player, Player) => Unit = (p1, p2) => ()) {
-    case MAGIC_MISSILE extends Spell(53,  0, atStart = (_, p2) => p2.hitPoints -= 4)
-    case DRAIN         extends Spell(73,  0, atStart = (p1, p2) => { p2.hitPoints -= 2; p1.hitPoints += 2 })
-    case SHIELD        extends Spell(113, 6, atStart = (p1, _) => p1.armourStrength += 7, atEnd = (p1, _) => p1.armourStrength -= 7)
-    case POISON        extends Spell(173, 6, whileActive = (_, p2) => p2.hitPoints -= 3)
-    case RECHARGE      extends Spell(229, 5, whileActive = (p1, _) => p1.cash += 101)
+           val applyImmediately: Boolean,
+           val effect: (Player, Player, Int) => Unit = (p1, p2, t) => ()) {
+    case MAGIC_MISSILE extends Spell(53,  1, true, (p1, p2, t) => p2.hitPoints -= 4)
+    case DRAIN         extends Spell(73,  1, true, (p1, p2, t) => { p2.hitPoints -= 2; p1.hitPoints += 2 })
+    case SHIELD        extends Spell(113, 6, true, (p1, p2, t) => { if (t == 6) p1.armourStrength += 7 else if (t == 0) p1.armourStrength -= 7 })
+    case POISON        extends Spell(173, 6, false, (p1, p2, t) => p2.hitPoints -= 3)
+    case RECHARGE      extends Spell(229, 5, false, (p1, p2, t) => p1.cash += 101)
 }
 
-case class Effect(var timer: Int, spell: Spell) {
-    //override def toString: String = "Effect"
-}
+case class Effect(spell: Spell, var timer: Int)
 
 object Effect {
-    def newEffect(e: Effect): Effect = Effect(e.timer, e.spell)
+    def newEffect(e: Effect): Effect = Effect(e.spell, e.timer)
 }
