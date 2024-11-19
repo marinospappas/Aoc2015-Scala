@@ -101,11 +101,11 @@ class WizardGame extends PuzzleSolver {
     // recursive version
     //
 
-    var minSpent: Int = Int.MaxValue
-    var partTwo: Boolean = false
+    private var minSpent: Int = Int.MaxValue
+    private var partTwo: Boolean = false
 
-    def playGame(bossHitPoints: Int, myHitPoints: Int, myCash: Int, activeEffects: List[Effect], playerTurn: Boolean, spent: Int): Any =
-        val bossDamageStrenth = boss.damageStrength
+    def playGame(bossHitPoints: Int, myHitPoints: Int, myCash: Int, activeEffects: List[Effect], playerTurn: Boolean, spent: Int): Unit =
+        val bossDamageStrength = boss.damageStrength
         var myArmour = 0
         var bossHp = bossHitPoints
         var myHp = myHitPoints
@@ -114,10 +114,10 @@ class WizardGame extends PuzzleSolver {
         if (partTwo && playerTurn)
             myHp -= 1
             if (myHitPoints <= 0)
-                return false
+                return
 
         val newActiveEffects: ArrayBuffer[Effect] = ArrayBuffer()
-        for (effect <- activeEffects) do
+        for (effect <- activeEffects) do {
             if (effect.timer >= 0)
                 bossHp -= effect.spell.damage
                 myHp += effect.spell.repair
@@ -127,24 +127,26 @@ class WizardGame extends PuzzleSolver {
             val newEffect = Effect(effect.spell, effect.timer - 1)
             if (newEffect.timer > 0)
                 newActiveEffects += newEffect
+        }
 
-        if (bossHp <= 0)
+        if (bossHp <= 0) {
             if (spent < minSpent)
                 minSpent = spent
-                return true
+                return
+        }
 
         if (spent >= minSpent)
-            return false
+            return
 
         if (playerTurn) {
-            for (spell <- Spell.values) do
-
-                val spellAlreadyActive = newActiveEffects.map( _.spell ).contains(spell)
+            for (spell <- Spell.values) do {
+                val spellAlreadyActive = newActiveEffects.map(_.spell).contains(spell)
                 if (spell.cost <= myCsh && !spellAlreadyActive)
                     playGame(bossHp, myHp, myCsh - spell.cost, (List[Effect]() ::: newActiveEffects.toList) :+ Effect(spell, spell.duration),
                         false, spent + spell.cost)
+            }
         } else {
-            myHp += myArmour - (if (myArmour - bossDamageStrenth < 0) bossDamageStrenth else 1)
+            myHp += myArmour - (if (myArmour - bossDamageStrength < 0) bossDamageStrength else 1)
             if (myHp > 0)
                 playGame(bossHp, myHp, myCsh, newActiveEffects.toList, true, spent)
         }
@@ -170,7 +172,7 @@ class WizardGame extends PuzzleSolver {
         minSpent = Int.MaxValue
         playGame(boss.hitPoints, me.hitPoints, me.cash, List[Effect](), true, 0)
         minSpent
-    
+
     extension (l: List[String])
         // Hit Points: 71
         // Damage: 10
