@@ -17,7 +17,7 @@ class Djikstra[T](g: Graph[T]) {
     val log: Logger = LoggerFactory.getLogger("Djikstra")
 
     Graph.aStarAlgorithm = false // ensure dijkstra is used
-    
+
     /**
      * Dijkstra algorithm
      */
@@ -43,6 +43,9 @@ class Djikstra[T](g: Graph[T]) {
                 return minCostPath
             }
             // else for each connected node
+            log.info(s"+++ connected nodes for node $currentNodeId")
+            for (next <-  g.getConnected(currentNodeId)) do
+                log.debug(s"+++      $next")
             boundary:
                 for (connectedNode <- g.getConnected(currentNodeId)) do
                     val nextPathNode = GraphPathNode(connectedNode._1, connectedNode._2)

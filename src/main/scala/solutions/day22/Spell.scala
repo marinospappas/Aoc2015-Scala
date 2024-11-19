@@ -9,18 +9,15 @@ package solutions.day22
 //      At the start of each turn while it is active, it deals the boss 3 damage.
 // Recharge costs 229 mana. It starts an effect that lasts for 5 turns.
 //      At the start of each turn while it is active, it gives you 101 new mana.
-enum Spell(val cost: Int,
-           var duration: Int,
-           val applyImmediately: Boolean,
-           val effect: (Player, Player, Int) => Unit = (p1, p2, t) => ()) {
-    case MAGIC_MISSILE extends Spell(53,  1, true, (p1, p2, t) => p2.hitPoints -= 4)
-    case DRAIN         extends Spell(73,  1, true, (p1, p2, t) => { p2.hitPoints -= 2; p1.hitPoints += 2 })
-    case SHIELD        extends Spell(113, 6, true, (p1, p2, t) => { if (t == 6) p1.armourStrength += 7 else if (t == 0) p1.armourStrength -= 7 })
-    case POISON        extends Spell(173, 6, false, (p1, p2, t) => p2.hitPoints -= 3)
-    case RECHARGE      extends Spell(229, 5, false, (p1, p2, t) => p1.cash += 101)
+enum Spell(val cost: Int, val immediateEffect: Boolean, val duration: Int, val damage: Int, val armour: Int, val repair: Int, val cash: Int) {
+    case MAGIC_MISSILE extends Spell(53,  true, 0, 4, 0, 0, 0)
+    case DRAIN         extends Spell(73,  true, 0, 2, 0, 2, 0)
+    case SHIELD        extends Spell(113, true, 6, 0, 7, 0, 0)
+    case POISON        extends Spell(173, false, 6, 3, 0, 0, 0)
+    case RECHARGE      extends Spell(229, false, 5, 0, 0, 0, 101)
 }
 
-case class Effect(spell: Spell, var timer: Int)
+case class Effect(spell: Spell, timer: Int)
 
 object Effect {
     def newEffect(e: Effect): Effect = Effect(e.spell, e.timer)
