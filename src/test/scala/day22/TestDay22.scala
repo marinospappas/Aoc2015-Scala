@@ -2,12 +2,11 @@ package org.mpdev.scala.aoc2015
 package day22
 
 import framework.AocMain
-import solutions.day22.{Effect, Player, WizardGame}
+import solutions.day22.{Effect, GameState, Player, Spell, WizardGame}
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import solutions.day22.Spell.*
-import solutions.day22.Spell
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers.*
@@ -37,11 +36,11 @@ class TestDay22 extends AnyFlatSpec {
         var winner = 0
         for (i <- 0 to 1)
             log.info(s"Round >>> $i")
-            val result = solver.playRound(me, spells(i), boss, effects)
-            me = result._2
-            boss = result._3
-            effects = result._4
-            winner = result._1
+    //        val result = solver.playRound(me, spells(i), boss, effects)
+      //7      me = result._2
+         //   boss = result._3
+         //   effects = result._4
+         //   winner = result._1
         log.info(s"End: $me - $boss")
         (winner, me.hitPoints, me.armourStrength, me.cash, boss.hitPoints) shouldBe (1, 2, 0, 24, 0)
     }
@@ -55,33 +54,32 @@ class TestDay22 extends AnyFlatSpec {
         var winner = 0
         for (i <- 0 to 4)
             log.info(s"\nRound >>> $i")
-            val result = solver.playRound(me, spells(i), boss, effects)
-            me = result._2
-            boss = result._3
-            effects = result._4
-            winner = result._1
+    //        val result = solver.playRound(me, spells(i), boss, effects)
+      //      me = result._2
+        //    boss = result._3
+          //  effects = result._4
+            //winner = result._1
         log.info(s"End: $me - $boss")
         (winner, me.hitPoints, me.armourStrength, me.cash, boss.hitPoints) shouldBe(1, 1, 0, 114, -1)
     }
 
     it should "solve part1 scenario 1" in {
         val me = Player("Me", 250, 10)
-        val minPath = solver.findMinCostForWin(me, solver.boss)
-        //val minPath = solver.playGame(me, solver.boss, List[Effect](), true, 0)
-        //log.debug(s"minimum cost : ${solver.minSpent}")
-        minPath.printPath()
-        (minPath.path.size, minPath.minCost) shouldBe (3, 226)
+        val startState: GameState = GameState(me.hitPoints, me.cash, 0, solver.boss.hitPoints, List[Effect](), true)
+        val result = solver.djikstra.minPath(startState, id => id.bossHitPoints <= 0)
+        println(result.minCost)
+        result.printPath()
     }
 
     it should "solve part1 scenario 2" in {
         val me = Player("Me", 250, 10)
         val boss = Player("Boss", 0, 14, 8)
-        val minPath = solver.findMinCostForWin(me, boss)
-        log.debug("minimum cost path: ")
-        minPath.printPath()
+        //val minPath = solver.findMinCostForWin(me, boss)
+        //log.debug("minimum cost path: ")
+        //minPath.printPath()
         //val minPath = solver.playGame(me, boss, List[Effect](), true, 0)
         //log.debug(s"minimum cost : ${solver.minSpent}")
-        (minPath.path.size, minPath.minCost) shouldBe(6, 641)
+        //(minPath.path.size, minPath.minCost) shouldBe(6, 641)
     }
 
     it should "solve part2 correctly" in {

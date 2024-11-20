@@ -14,88 +14,70 @@ class WizardGame extends PuzzleSolver {
     val boss: Player = Player("Boss", hitPoints = wizData.head, damageStrength = wizData(1))
     val me: Player = Player("Me", 500, 50)
     val graph: Graph[GameState] = Graph(customGetConnected = id => getNextStates(id))
-    private val djikstra: Djikstra[GameState] = Djikstra(graph)
+    val djikstra: Djikstra[GameState] = Djikstra(graph)
+    val startState: GameState = GameState(me.hitPoints, me.cash, 0, boss.hitPoints, List[Effect](), true)
 
     //
-    // play one round of the wizard game
+    // calculate possible next states in the game (for Djikstra algorithm)
     //
 
-    def applySpell(spell: Spell, p: Player, b: Player, timer: Int): (Player, Player) =
-        val player1 = Player(p.name, p.cash + spell.cash, p.hitPoints + spell.repair, p.damageStrength, p.armourStrength + spell.armour)
-        val boss = Player(b.name, 0, b.hitPoints - spell.damage, b.damageStrength)
-        (player1, boss)
+    private def getNextStates(gameState: GameState): Set[(GameState, Int)] =
+        log.debug(s"*** identifying next states from: $gameState")
+        var state: GameState = GameStateBuilder(gameState).build()
+        if (partTwo && state.playerTurn)
+            state = GameStateBuilder(state).withPlayerHitPoints(state.playerHitPoints - 1).build()
+            if (state.playerHitPoints <= 0)
+                log.debug(s"***     no next states found")
+                return Set()
 
-    def applyEffects(player1: Player, player2: Player, effects: List[Effect]): (Player, Player, List[Effect]) =
-        val activeEffects: ArrayBuffer[Effect] = ArrayBuffer()
-        var (p1, p2) = (Player(player1.name, player1.cash, player1.hitPoints, player1.damageStrength), player2)
-        for (effect <- effects) do
-            val res = applySpell(effect.spell, p1, p2, effect.timer)
-            p1 = res._1
-            p2 = res._2
-            log.debug(s"applied ${effect.spell}")
-            if (effect.timer <= 1)
-                log.debug(s"ended ${effect.spell}")
+        state = processActiveSpells(state)
+        if (state.bossHitPoints <= 0)
+            log.debug(s"***     no next states found")
+            return Set()
+
+        if (state.playerTurn) {
+            val nextStates: ArrayBuffer[(GameState, Int)] = ArrayBuffer()
+            for (spell <- Spell.values) do {
+                val spellAlreadyActive = state.activeEffects.map(_.spell).contains(spell)
+                if (spell.cost <= state.playerCash && !spellAlreadyActive)
+                    nextStates += ((GameStateBuilder(state)
+                        .withPlayerCash(state.playerCash - spell.cost)
+                        .withActiveSpells((List[Effect]() ::: state.activeEffects) :+ Effect(spell, spell.duration))
+                        .withPlayerTurn(false).build(), spell.cost))
+            }
+            for (st <- nextStates)
+                log.debug(s"***     $st")
+            nextStates.toSet
+        } else {
+            val playerHitPoints = state.playerHitPoints +
+                state.playerArmour - (if (state.playerArmour - boss.damageStrength < 0) boss.damageStrength else 1)
+            if (playerHitPoints > 0)
+                val newState = Set((GameStateBuilder(state).withPlayerHitPoints(playerHitPoints).withPlayerTurn(true).build(), 0))
+                log.debug(s"***     $newState")
+                newState
             else
-                activeEffects += Effect(effect.spell, effect.timer - 1)
-        log.debug(s"active effects $activeEffects")
-        (p1, p2, activeEffects.toList)
+                log.debug(s"***     no next states found")
+                Set()
+        }
 
-    def playerRound(player: Player, spell: Spell, boss: Player, effects: List[Effect]): (Int, Player, Player, List[Effect]) =
-        log.debug("** Player turn")
-        log.debug(s"player $player")
-        log.debug(s"boss $boss")
-        var (p1, b, newEffects) = applyEffects(player, boss, effects)
-        if (b.gameOver)
-            return (1, p1, b, newEffects)
-        if (spell.cost > player.cash || effects.count( _.spell == spell ) > 0)
-            return (-1, p1, b, newEffects)
-        p1 = Player(p1.name, p1.cash - spell.cost, p1.hitPoints, p1.damageStrength, p1.armourStrength)
-        log.debug(s"player casts $spell")
-        if (spell.immediateEffect)
-            val res = applySpell(spell, p1, b, 1)
-            p1 = res._1
-            b = res._2
-            log.debug(s"immediate effect $spell")
-        if (spell.duration > 1)
-            newEffects = (List() ::: newEffects) :+ Effect(spell, spell.duration - /*(if (spell.immediateEffect) 1 else*/ 0) //)
-        (0, p1, b, newEffects)
-
-    def bossRound(player: Player, boss: Player, effects: List[Effect]): (Int, Player, Player, List[Effect]) =
-        log.debug("** Boss turn")
-        log.debug(s"player $player")
-        log.debug(s"boss $boss")
-        var (p1, p2, newEffects) = applyEffects(player, boss, effects)
-        if (p2.gameOver)
-            return (1, p1, p2, newEffects)
-        log.debug(s"boss does ${p2.damageStrength - p1.armourStrength} damage")
-        p1 = p1.defend(p2)
-        if (p1.gameOver)
-            return (-1, p1, p2, newEffects)
-        (0, p1, p2, newEffects)
-
-
-    def playRound(player: Player, spell: Spell, boss: Player, effects: List[Effect]): (Int, Player, Player, List[Effect]) =
-        val result = playerRound(player, spell, boss, effects)
-        if (result._1 != 0)
-            result
-        else
-            bossRound(result._2, result._3, result._4)
-
-    //
-    // calculate possible next states in the game
-    //
-
-    private def getNextStates(state: GameState): Set[(GameState, Int)] =
-        val nextStates: ArrayBuffer[(GameState, Int)] = ArrayBuffer()
-        applyEffects(state.player1, state.player2, state.effects)
-        for (spell <- Spell.values) do
-            val result = playRound(state.player1, spell, state.player2, state.effects)
-            if (result._1 >= 0)
-                nextStates += ((GameState.newState(GameState(result._2, spell, result._3, result._4)), spell.cost))
-        log.debug(s"**** next states from $state: ")
-        for (next <- nextStates) do
-            log.debug(s"****      $next")
-        nextStates.toSet
+    private def processActiveSpells(state: GameState): GameState =
+        val newActiveEffects: ArrayBuffer[Effect] = ArrayBuffer()
+        var playerArmour = 0
+        var bossHitPoints = state.bossHitPoints
+        var playerHitPoints = state.playerHitPoints
+        var playerCash = state.playerCash
+        for (effect <- state.activeEffects) do {
+            if (effect.timer >= 0) {
+                bossHitPoints -= effect.spell.damage
+                playerHitPoints += effect.spell.repair
+                playerArmour += effect.spell.armour
+                playerCash += effect.spell.cash
+            }
+            val newEffect = Effect(effect.spell, effect.timer - 1)
+            if (newEffect.timer > 0)
+                newActiveEffects += newEffect
+        }
+        GameState(playerHitPoints, playerCash, playerArmour, bossHitPoints, newActiveEffects.toList, state.playerTurn)
 
     //
     // recursive version
@@ -104,74 +86,55 @@ class WizardGame extends PuzzleSolver {
     private var minSpent: Int = Int.MaxValue
     private var partTwo: Boolean = false
 
-    def playGame(bossHitPoints: Int, myHitPoints: Int, myCash: Int, activeEffects: List[Effect], playerTurn: Boolean, spent: Int): Unit =
-        val bossDamageStrength = boss.damageStrength
-        var myArmour = 0
-        var bossHp = bossHitPoints
-        var myHp = myHitPoints
-        var myCsh = myCash
+    def playGame(gameState: GameState, spent: Int): Unit =
+        var state: GameState = GameStateBuilder(gameState).build()
 
-        if (partTwo && playerTurn)
-            myHp -= 1
-            if (myHitPoints <= 0)
+        if (partTwo && state.playerTurn)
+            state = GameStateBuilder(state).withPlayerHitPoints(state.playerHitPoints - 1).build()
+            if (state.playerHitPoints <= 0)
                 return
 
-        val newActiveEffects: ArrayBuffer[Effect] = ArrayBuffer()
-        for (effect <- activeEffects) do {
-            if (effect.timer >= 0)
-                bossHp -= effect.spell.damage
-                myHp += effect.spell.repair
-                myArmour += effect.spell.armour
-                myCsh += effect.spell.cash
-
-            val newEffect = Effect(effect.spell, effect.timer - 1)
-            if (newEffect.timer > 0)
-                newActiveEffects += newEffect
-        }
-
-        if (bossHp <= 0) {
+        state = processActiveSpells(state)
+        if (state.bossHitPoints <= 0) {
             if (spent < minSpent)
                 minSpent = spent
-                return
+            return
         }
-
         if (spent >= minSpent)
             return
 
-        if (playerTurn) {
+        if (state.playerTurn) {
             for (spell <- Spell.values) do {
-                val spellAlreadyActive = newActiveEffects.map(_.spell).contains(spell)
-                if (spell.cost <= myCsh && !spellAlreadyActive)
-                    playGame(bossHp, myHp, myCsh - spell.cost, (List[Effect]() ::: newActiveEffects.toList) :+ Effect(spell, spell.duration),
-                        false, spent + spell.cost)
+                val spellAlreadyActive = state.activeEffects.map(_.spell).contains(spell)
+                if (spell.cost <= state.playerCash && !spellAlreadyActive)
+                    playGame(GameStateBuilder(state)
+                        .withPlayerCash(state.playerCash - spell.cost)
+                        .withActiveSpells((List[Effect]() ::: state.activeEffects) :+ Effect(spell, spell.duration))
+                        .withPlayerTurn(false).build(),
+                        spent + spell.cost)
             }
         } else {
-            myHp += myArmour - (if (myArmour - bossDamageStrength < 0) bossDamageStrength else 1)
-            if (myHp > 0)
-                playGame(bossHp, myHp, myCsh, newActiveEffects.toList, true, spent)
+            val playerHitPoints = state.playerHitPoints +
+                state.playerArmour - (if (state.playerArmour - boss.damageStrength < 0) boss.damageStrength else 1)
+            if (playerHitPoints > 0)
+                playGame(GameStateBuilder(state).withPlayerHitPoints(playerHitPoints).withPlayerTurn(true).build(), spent)
         }
 
     //
     // solve part 1 and 2
     //
 
-    def findMinCostForWin(p1: Player, p2: Player): MinCostPath[GameState] =
-        val start: GameState = GameState(p1, null, p2, List[Effect]())
-        djikstra.minPath(start, id => id.player2.hitPoints <= 0)
-
     override def solvePart1: Any =
-        //val minPath = findMinCostForWin(me, boss)
-        //log.debug("minimum cost path: ")
+        //val minPath = djikstra.minPath(startState, id => id.bossHitPoints <= 0)
         //minPath.printPath()
         //minPath.minCost
-        playGame(boss.hitPoints, me.hitPoints, me.cash, List[Effect](), true, 0)
+        playGame(startState, 0)
         minSpent
 
     override def solvePart2: Any =
         partTwo = true
         minSpent = Int.MaxValue
-        playGame(boss.hitPoints, me.hitPoints, me.cash, List[Effect](), true, 0)
-        minSpent
+        solvePart1
 
     extension (l: List[String])
         // Hit Points: 71

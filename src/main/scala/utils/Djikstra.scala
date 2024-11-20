@@ -42,12 +42,10 @@ class Djikstra[T](g: Graph[T]) {
                 minCostPath.path = dijkstraCost.getMinCostPath(currentNodeId, start)
                 return minCostPath
             }
-            // else for each connected node
-            log.info(s"+++ connected nodes for node $currentNodeId")
-            for (next <-  g.getConnected(currentNodeId)) do
-                log.debug(s"+++      $next")
             boundary:
+                log.trace(s"> connected nodes for node $currentNodeId")
                 for (connectedNode <- g.getConnected(currentNodeId)) do
+                    log.trace(s">>      $connectedNode")
                     val nextPathNode = GraphPathNode(connectedNode._1, connectedNode._2)
                     if (visited.contains(nextPathNode))
                         break()
@@ -64,7 +62,7 @@ class Djikstra[T](g: Graph[T]) {
                         // and put the updated new node back into the priority queue
                         priorityQueue.add(nextPathNode)
         }
-        dijkstraCost.pathMap.foreach( println(_) )
+        //dijkstraCost.pathMap.foreach( println(_) )
         throw AoCException(s"no path found from $start to endState")
     }
 }
