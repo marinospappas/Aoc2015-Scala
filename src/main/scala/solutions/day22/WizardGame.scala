@@ -80,11 +80,11 @@ class WizardGame extends PuzzleSolver {
         GameState(playerHitPoints, playerCash, playerArmour, bossHitPoints, newActiveEffects.toList, state.playerTurn)
 
     //
-    // recursive version
+    // recursive version for minimum spend to win
     //
 
-    private var minSpent: Int = Int.MaxValue
-    private var partTwo: Boolean = false
+    var minSpent: Int = Int.MaxValue
+    var partTwo: Boolean = false
 
     def playGame(gameState: GameState, spent: Int): Unit =
         var state: GameState = GameStateBuilder(gameState).build()

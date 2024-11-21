@@ -1,16 +1,15 @@
 package org.mpdev.scala.aoc2015
 package graph
 
-import utils.{Djikstra, Dfs, Graph}
+import utils.{Dfs, Djikstra, Graph}
 
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers.*
+import org.slf4j.{Logger, LoggerFactory}
 
-class TestDjikstra extends AnyFlatSpec {
+class TestDfs extends AnyFlatSpec {
 
-    val log: Logger = LoggerFactory.getLogger(classOf[TestDjikstra])
+    val log: Logger = LoggerFactory.getLogger(classOf[TestDfs])
     
     val graph: Graph[String] = Graph()
     {
@@ -18,16 +17,15 @@ class TestDjikstra extends AnyFlatSpec {
         graph.addNodesWithCost("2", Set( ("3", 2), ("7", 10) ))
         graph.addNodesWithCost("3", Set( ("4", 3), ("7", 8) ))
         graph.addNodesWithCost("4", Set( ("7", 1) ))
-        graph.addNodesWithCost("5", Set( ("6", 2) ))
+        graph.addNodesWithCost("5", Set( ("2", 3), ("6", 2) ))
         graph.addNodesWithCost("6", Set( ("7", 1) ))
         graph.addNodesWithCost("7", Set())
         graph.printIt()
     }
 
     it should "find minimum path in simple graph" in {
-        val result = Djikstra[String](graph).minPath("1", id => id == "7")
-        result.printPath()
-        (result.minCost, result.path.size) shouldBe (7, 5)
-    }
-    
+        val result = Dfs[String](graph).shortestPath("1", "7")
+        println(result)
+        result._1 shouldBe 7
+    } 
 }
