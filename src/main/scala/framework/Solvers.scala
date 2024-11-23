@@ -12,11 +12,12 @@ import solutions.day07.DigitalCircuit
 import solutions.day23.Computer
 import solutions.day21.FightGame
 import solutions.day22.WizardGame
+import solutions.day16.IdentificationOfItems
 
 val solvers = Map(
     1 -> ElevatorButtons(), 2 -> PresentWrapping(), 4 -> Mad5HashProcessor(), 5 -> StringsInspection(),
     7 -> DigitalCircuit(),
     9 -> ShortestAndLongestRoute(), 12 -> JsonProcessor(),
-    18 -> LightsAnimation(),
+    16 -> IdentificationOfItems(), 18 -> LightsAnimation(),
     21 -> FightGame(), 22 -> WizardGame(), 23 -> Computer()
 )
