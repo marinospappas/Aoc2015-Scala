@@ -25,9 +25,7 @@ class IdentificationOfItems extends PuzzleSolver {
 }
 
 case class Entry(id: Int, attributes: List[(Attribute, Int)]) {
-
     def matchPart1: Boolean = attributes.forall( atr => atr._1.count == atr._2 )
-
     def matchPart2: Boolean = attributes.forall( atr => atr._1.check(atr._2))
 }
 
