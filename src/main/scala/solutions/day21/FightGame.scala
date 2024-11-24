@@ -27,7 +27,7 @@ class FightGame extends PuzzleSolver {
         while result == 0 do
             result = playRound(player1, player2)
         // 1 = player 1 wins, 2 = player 2 wins
-        if (result == 1) 1 else 2
+        result
 
     def playersCombinations(): List[Player] =
         val combis: ArrayBuffer[Player] = ArrayBuffer()
@@ -59,7 +59,7 @@ class FightGame extends PuzzleSolver {
         var result = -1
         boundary:
             for (player <- playersCombinations().reverse)
-                if (playGame(player, Player("Boss", boss.hitPoints, boss.damageStrength, boss.armourStrength)) == 2)
+                if (playGame(player, Player("Boss", boss.hitPoints, boss.damageStrength, boss.armourStrength)) == -1)
                     result = player.cost
                     break()
         result
