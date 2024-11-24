@@ -2,7 +2,7 @@ package org.mpdev.scala.aoc2015
 package day02
 
 import solutions.day02.PresentWrapping
-import framework.{AocMain, InputReader}
+import framework.AocMain
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers.*
