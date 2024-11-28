@@ -15,7 +15,7 @@ class PacketsDistribution extends PuzzleSolver {
     private def findSumOfDivisors(number: Int) = 
         PrimeNumbers.divisors2(number).sum
 
-    def findTotalPackets2(number: Int): Int = {
+    private def findTotalPackets2(number: Int): Int = {
         var result = 0
         val n = ceil(sqrt(number.toDouble)).toInt
         for (i <- 1 to n) {
