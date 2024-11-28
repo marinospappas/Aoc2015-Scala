@@ -4,7 +4,6 @@ package day20
 import framework.AocMain
 import solutions.day20.PacketsDistribution
 
-import utils.PrimeNumbers
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers.*
 
