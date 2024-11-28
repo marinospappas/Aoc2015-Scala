@@ -15,11 +15,12 @@ import solutions.day22.WizardGame
 import solutions.day16.IdentificationOfItems
 import solutions.day08.StringLengthCalculator
 import solutions.day17.Containerisation
+import solutions.day20.PacketsDistribution
 
 val solvers = Map(
     1 -> ElevatorButtons(), 2 -> PresentWrapping(), 4 -> Mad5HashProcessor(), 5 -> StringsInspection(),
     7 -> DigitalCircuit(), 8 -> StringLengthCalculator(), 9 -> ShortestAndLongestRoute(),
     12 -> JsonProcessor(),
-    16 -> IdentificationOfItems(), 17 -> Containerisation(), 18 -> LightsAnimation(),
+    16 -> IdentificationOfItems(), 17 -> Containerisation(), 18 -> LightsAnimation(), 20 -> PacketsDistribution(),
     21 -> FightGame(), 22 -> WizardGame(), 23 -> Computer()
 )
