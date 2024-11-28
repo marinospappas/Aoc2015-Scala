@@ -8,9 +8,12 @@ import scala.math.{sqrt, ceil}
 class PacketsDistribution extends PuzzleSolver {
 
     private final val target = InputReader.read(20).head.toInt
-
+    {
+        PrimeNumbers.eratosthenesSieve(target)
+    }
+    
     private def findSumOfDivisors(number: Int) = 
-        PrimeNumbers.divisors(number).sum
+        PrimeNumbers.divisors2(number).sum
 
     def findTotalPackets2(number: Int): Int = {
         var result = 0
