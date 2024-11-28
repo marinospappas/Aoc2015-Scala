@@ -10,7 +10,7 @@ object AocMain {
 }
 
 @main
-def aoc2024(args: String*): Unit =
+def aoc2015(args: String*): Unit =
     if (args.isEmpty)
         usage()
     val day = args(0).toInt
